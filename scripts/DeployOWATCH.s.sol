@@ -16,6 +16,7 @@ contract DeployOWATCH is Script {
 
         console.log("OWATCH deployed to:", address(owatch));
         console.log("Initial supply:", owatch.totalSupply() / 10**18, "OWATCH");
+        console.log("Owner:", msg.sender);
 
         vm.stopBroadcast();
     }

@@ -10,9 +10,6 @@ contract OWATCHTest is Test {
     address public user1;
     address public user2;
 
-    bytes32 public videoId1 = keccak256("video1");
-    bytes32 public videoId2 = keccak256("video2");
-
     function setUp() public {
         owner = address(this);
         user1 = makeAddr("user1");
@@ -31,13 +28,78 @@ contract OWATCHTest is Test {
         vm.prank(user1);
         owatch.registerUser();
 
-        (uint256 totalWatchedTime, uint256 totalEarned, uint256 currentBalance, uint256 streakDays, bool isRegistered) = owatch.getUserStats(user1);
-
-        assertTrue(isRegistered);
-        assertEq(totalWatchedTime, 0);
-        assertEq(totalEarned, 0);
-        assertEq(streakDays, 0);
+        (bool registered, uint256 balance) = owatch.getUserInfo(user1);
+        assertTrue(registered);
+        assertEq(balance, 0);
     }
+
+    function testEarnReward() public {
+        // Register user first
+        vm.prank(user1);
+        owatch.registerUser();
+
+        // Earn reward for 5 minutes
+        vm.prank(user1);
+        owatch.earnReward(5);
+
+        uint256 expectedReward = 5 * 10 * 10**18; // 5 minutes * 10 OWATCH per minute
+        assertEq(owatch.balanceOf(user1), expectedReward);
+
+        (, uint256 userBalance) = owatch.getUserInfo(user1);
+        assertEq(userBalance, expectedReward);
+    }
+
+    function testCannotEarnWithoutRegistration() public {
+        vm.prank(user1);
+        vm.expectRevert("Not registered");
+        owatch.earnReward(5);
+    }
+
+    function testMinimumWatchTime() public {
+        vm.prank(user1);
+        owatch.registerUser();
+
+        vm.prank(user1);
+        vm.expectRevert("Minimum 1 minute");
+        owatch.earnReward(0);
+    }
+
+    function testCannotRegisterTwice() public {
+        vm.prank(user1);
+        owatch.registerUser();
+
+        vm.prank(user1);
+        vm.expectRevert("Already registered");
+        owatch.registerUser();
+    }
+
+    function testEmergencyWithdraw() public {
+        // Transfer some tokens to contract
+        owatch.transfer(address(owatch), 1000 * 10**18);
+
+        uint256 ownerBalanceBefore = owatch.balanceOf(owner);
+        owatch.emergencyWithdraw(500 * 10**18);
+
+        assertEq(owatch.balanceOf(owner), ownerBalanceBefore + 500 * 10**18);
+    }
+
+    function testOnlyOwnerCanEmergencyWithdraw() public {
+        owatch.transfer(address(owatch), 1000 * 10**18);
+
+        vm.prank(user1);
+        vm.expectRevert("Ownable: caller is not the owner");
+        owatch.emergencyWithdraw(500 * 10**18);
+    }
+
+    function testTokenTransfer() public {
+        uint256 transferAmount = 100 * 10**18;
+
+        owatch.transfer(user1, transferAmount);
+
+        assertEq(owatch.balanceOf(user1), transferAmount);
+        assertEq(owatch.balanceOf(owner), (1_000_000 * 10**18) - transferAmount);
+    }
+}
 
     function testAddVideo() public {
         uint256 duration = 300; // 5 minutes

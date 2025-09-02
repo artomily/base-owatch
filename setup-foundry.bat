@@ -1,41 +1,47 @@
 @echo off
-echo Setting up Foundry for O'Watch.ID Smart Contract Development
-echo ========================================================
+echo ============================================
+echo  O'Watch.ID Smart Contract Setup (Simple)
+echo ============================================
+echo.
+
+REM Check if Node.js is installed
+node --version >nul 2>&1
+if %errorlevel% neq 0 (
+    echo [ERROR] Node.js tidak terinstall!
+    echo Silakan download dari: https://nodejs.org/
+    pause
+    exit /b 1
+) else (
+    echo [OK] Node.js terinstall
+)
 
 REM Check if Foundry is installed
 forge --version >nul 2>&1
 if %errorlevel% neq 0 (
-    echo Foundry not found. Installing Foundry...
-    REM Try to install Foundry using the official installer
-    powershell -Command "& { try { irm https://foundry.paradigm.xyz | iex } catch { echo 'Failed to install Foundry automatically. Please install manually from https://book.getfoundry.sh/getting-started/installation.html' } }"
+    echo [WARNING] Foundry tidak terinstall
+    echo.
+    echo Menginstall Foundry...
+    echo Jika gagal, download manual dari:
+    echo https://github.com/foundry-rs/foundry/releases
+    echo.
+
+    REM Try to install Foundry
+    powershell -Command "& { try { irm https://foundry.paradigm.xyz | iex } catch { echo 'Gagal install Foundry otomatis' } }"
 ) else (
-    echo Foundry is already installed.
-)
-
-REM Install dependencies
-echo Installing OpenZeppelin contracts...
-forge install OpenZeppelin/openzeppelin-contracts
-
-REM Create lib directory if it doesn't exist
-if not exist "lib" mkdir lib
-
-REM Copy OpenZeppelin contracts to lib
-if exist "lib\forge-std" (
-    echo Forge std already exists
-) else (
-    echo Installing forge-std...
-    forge install foundry-rs/forge-std
+    echo [OK] Foundry terinstall
 )
 
 echo.
-echo Setup complete! You can now:
-echo - Compile contracts: forge build
-echo - Run tests: forge test
-echo - Deploy to Base: forge script scripts/DeployOWATCH.s.sol --rpc-url https://mainnet.base.org --private-key YOUR_PRIVATE_KEY --broadcast
+echo Menginstall dependencies...
+call npm install
+
 echo.
-echo Make sure to:
-echo 1. Set up your .env file with PRIVATE_KEY
-echo 2. Get BaseScan API key for contract verification
-echo 3. Fund your wallet with Base ETH for deployment
+echo Setup selesai!
+echo.
+echo Selanjutnya:
+echo 1. Setup .env file dengan private key
+echo 2. Dapatkan ETH testnet dari faucet
+echo 3. Jalankan: npm run contract:test
+echo 4. Deploy: npm run contract:deploy:sepolia
 echo.
 pause

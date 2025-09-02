@@ -1,188 +1,214 @@
-# O'Watch.ID Smart Contract
+# O'Watch.ID Smart Contract (Simplified)
 
-Smart contract untuk platform watch-to-earn O'Watch.ID yang berjalan di Base network.
+Smart contract sederhana untuk platform watch-to-earn O'Watch.ID menggunakan Base network.
 
-## 🚀 Features
+## �️ Tools yang Dibutuhkan
 
-- **User Registration**: Sistem registrasi user yang aman
-- **Video Watching Rewards**: Sistem reward berdasarkan waktu menonton video
-- **ERC20 Token**: Token OWATCH yang fully compliant dengan ERC20 standard
-- **Admin Controls**: Kontrol penuh untuk owner/platform
-- **Security**: Reentrancy protection dan access controls
-
-## 📋 Prerequisites
-
-- [Foundry](https://book.getfoundry.sh/getting-started/installation.html)
-- [Node.js](https://nodejs.org/) (untuk frontend integration)
-- Wallet dengan Base network support
-
-## 🛠️ Setup
-
-### 1. Install Dependencies
-
+### 1. **Foundry** (Development Framework)
 ```bash
 # Install Foundry
 curl -L https://foundry.paradigm.xyz | bash
 foundryup
 
-# Install dependencies
-forge install OpenZeppelin/openzeppelin-contracts
+# Verify installation
+forge --version
 ```
 
-### 2. Environment Setup
-
-Buat file `.env` di root directory:
-
+### 2. **Node.js & NPM** (sudah terinstall)
 ```bash
-# Private key untuk deploy (gunakan test wallet untuk development)
-PRIVATE_KEY=your_private_key_here
+node --version
+npm --version
+```
 
-# Base network RPC URLs
-BASE_MAINNET_RPC=https://mainnet.base.org
-BASE_SEPOLIA_RPC=https://sepolia.base.org
+### 3. **Wallet dengan Base Sepolia ETH**
+- [MetaMask](https://metamask.io/) atau wallet lainnya
+- Dapatkan ETH testnet dari [Base Sepolia Faucet](https://sepoliafaucet.com/)
 
-# Block explorer API keys
-BASESCAN_API_KEY=your_basescan_api_key
+## � Quick Start
+
+### 1. Setup Project
+```bash
+# Clone atau setup project
+cd base-owatch
+
+# Install dependencies
+npm install
+```
+
+### 2. Setup Environment
+```bash
+# Copy environment file
+cp .env.example .env
+
+# Edit .env dengan private key Anda
+# PRIVATE_KEY=your_private_key_here
 ```
 
 ### 3. Compile Contract
-
 ```bash
+# Menggunakan Foundry
 forge build
+
+# Atau menggunakan NPM script
+npm run contract:build
 ```
 
 ### 4. Run Tests
-
 ```bash
+# Run semua test
 forge test
+
+# Atau menggunakan NPM script
+npm run contract:test
 ```
 
-### 5. Deploy ke Base Network
-
-#### Deploy ke Base Sepolia (Testnet)
-
+### 5. Deploy ke Base Sepolia Testnet
 ```bash
-forge script scripts/DeployOWATCH.s.sol --rpc-url $BASE_SEPOLIA_RPC --private-key $PRIVATE_KEY --broadcast --verify
+# Pastikan punya ETH di wallet untuk gas fees
+forge script scripts/DeployOWATCH.s.sol --rpc-url https://sepolia.base.org --private-key $PRIVATE_KEY --broadcast --verify
+
+# Atau menggunakan NPM script
+npm run contract:deploy:sepolia
 ```
 
-#### Deploy ke Base Mainnet
-
-```bash
-forge script scripts/DeployOWATCH.s.sol --rpc-url $BASE_MAINNET_RPC --private-key $PRIVATE_KEY --broadcast --verify
-```
-
-## 📚 Contract Overview
+## � Contract Features (Simplified)
 
 ### OWATCH Token Contract
-
-**Address**: [Will be updated after deployment]
-
-**Features**:
-- ERC20 compliant token
-- User registration system
-- Video watching reward system
-- Admin controls for video management
-- Emergency functions
+- ✅ **ERC20 Token** dengan 1 juta supply awal
+- ✅ **User Registration** - Sistem registrasi sederhana
+- ✅ **Earn Rewards** - Dapat reward berdasarkan menit menonton (10 OWATCH per menit)
+- ✅ **Emergency Functions** - Fungsi darurat untuk owner
 
 ### Key Functions
+```solidity
+// Register sebagai user
+registerUser()
 
-#### User Functions
-- `registerUser()`: Register sebagai user platform
-- `recordWatchTime(bytes32 videoId, uint256 watchedSeconds)`: Record waktu menonton video
-- `claimRewards()`: Claim reward yang tersedia
-- `getUserStats(address user)`: Get statistik user
+// Earn reward (dalam menit)
+earnReward(uint256 minutesWatched)
 
-#### Admin Functions
-- `addVideo(bytes32 videoId, uint256 duration, uint256 rewardPerSecond)`: Tambah video baru
-- `updateVideoReward(bytes32 videoId, uint256 newRewardPerSecond)`: Update reward video
-- `setVideoActive(bytes32 videoId, bool active)`: Aktifkan/nonaktifkan video
-- `emergencyWithdraw(uint256 amount)`: Emergency withdraw (owner only)
+// Get user info
+getUserInfo(address user) returns (bool registered, uint256 balance)
 
-## 🔧 Integration dengan Frontend
-
-### Environment Variables
-
-Tambahkan ke `.env` file frontend:
-
-```bash
-NEXT_PUBLIC_OWATCH_CONTRACT_ADDRESS=0x... # Contract address setelah deploy
-NEXT_PUBLIC_BASE_RPC_URL=https://mainnet.base.org
-```
-
-### Contract Interaction Example
-
-```typescript
-import { ethers } from 'ethers';
-import OWATCH_ABI from './contracts/OWATCH.json';
-
-// Connect to contract
-const provider = new ethers.providers.Web3Provider(window.ethereum);
-const signer = provider.getSigner();
-const owatchContract = new ethers.Contract(
-  process.env.NEXT_PUBLIC_OWATCH_CONTRACT_ADDRESS,
-  OWATCH_ABI,
-  signer
-);
-
-// Register user
-await owatchContract.registerUser();
-
-// Record watch time
-const videoId = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("video_123"));
-await owatchContract.recordWatchTime(videoId, 300); // 5 minutes
+// Emergency withdraw (owner only)
+emergencyWithdraw(uint256 amount)
 ```
 
 ## 🧪 Testing
 
 ### Local Testing
-
 ```bash
-# Run all tests
+# Run semua test
 forge test
 
-# Run specific test
+# Run test spesifik
 forge test --match-test testUserRegistration
 
-# Run with gas reporting
+# Dengan gas report
 forge test --gas-report
 ```
 
-### Coverage Report
-
+### Test Coverage
 ```bash
 forge coverage
 ```
 
-## 📊 Deployment Information
+## 🌐 Deployment
 
 ### Base Sepolia Testnet
-- **Contract Address**: [TBD]
-- **Block Explorer**: https://sepolia.basescan.org/
-- **Faucet**: https://sepoliafaucet.com/
+```bash
+# Deploy
+forge script scripts/DeployOWATCH.s.sol \
+  --rpc-url https://sepolia.base.org \
+  --private-key $PRIVATE_KEY \
+  --broadcast \
+  --verify
 
-### Base Mainnet
-- **Contract Address**: [TBD]
-- **Block Explorer**: https://basescan.org/
+# Verify contract
+forge verify-contract <CONTRACT_ADDRESS> OWATCH \
+  --chain-id 84532 \
+  --etherscan-api-key $BASESCAN_API_KEY
+```
 
-## 🔒 Security
+### Base Mainnet (Production)
+```bash
+# Deploy ke mainnet (hati-hati!)
+forge script scripts/DeployOWATCH.s.sol \
+  --rpc-url https://mainnet.base.org \
+  --private-key $PRIVATE_KEY \
+  --broadcast \
+  --verify
+```
 
-- ReentrancyGuard protection
-- Access control dengan Ownable
-- Input validation
-- Emergency functions untuk owner
+## 🔧 Environment Setup
 
-## 📝 License
+### .env File
+```bash
+# Wallet Private Key (untuk deploy)
+PRIVATE_KEY=your_private_key_here
 
-MIT License - see LICENSE file for details.
+# BaseScan API Key (untuk verify contract)
+BASESCAN_API_KEY=your_basescan_api_key
 
-## 🤝 Contributing
+# Contract Address (setelah deploy)
+NEXT_PUBLIC_OWATCH_CONTRACT_ADDRESS=0x...
+```
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+## 📊 Networks
+
+| Network | RPC URL | Block Explorer | Chain ID |
+|---------|---------|----------------|----------|
+| Base Sepolia | https://sepolia.base.org | https://sepolia.basescan.org | 84532 |
+| Base Mainnet | https://mainnet.base.org | https://basescan.org | 8453 |
+
+## 💰 Getting Test ETH
+
+1. **Base Sepolia Faucet**: https://sepoliafaucet.com/
+2. **Paradigm Faucet**: https://faucet.paradigm.xyz/
+3. **Alchemy Faucet**: https://sepoliafaucet.com/
+
+## � Verify Contract
+
+Setelah deploy, verify contract di BaseScan:
+
+```bash
+forge verify-contract <YOUR_CONTRACT_ADDRESS> OWATCH \
+  --chain-id 84532 \
+  --etherscan-api-key $BASESCAN_API_KEY
+```
+
+## � Frontend Integration
+
+Setelah deploy, update `.env` di frontend:
+
+```bash
+NEXT_PUBLIC_OWATCH_CONTRACT_ADDRESS=0x... # Address dari deployment
+```
+
+## 🆘 Troubleshooting
+
+### Foundry tidak terinstall
+```bash
+# Windows
+# Download dari: https://github.com/foundry-rs/foundry/releases
+# Extract dan tambahkan ke PATH
+
+# Linux/Mac
+curl -L https://foundry.paradigm.xyz | bash
+```
+
+### Gas estimation failed
+- Pastikan wallet punya cukup ETH untuk gas
+- Coba deploy di jam sepi
+
+### Contract verification failed
+- Pastikan BASESCAN_API_KEY benar
+- Tunggu beberapa menit setelah deploy
+- Cek contract address di BaseScan
 
 ## 📞 Support
 
-For support, email support@owatch.id or join our Discord community.
+Untuk bantuan:
+- Cek [Foundry Documentation](https://book.getfoundry.sh/)
+- Join [Base Discord](https://discord.gg/buildonbase)
+- Cek [BaseScan](https://sepolia.basescan.org/)
