@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import { ResponseLogger } from "@/components/response-logger";
+import { ResponseLogger } from "@/utils/response-logger";
 import { cookies } from "next/headers";
 
 const geistSans = Inter({ subsets: ["latin"], variable: "--font-geist-sans" });
