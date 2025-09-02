@@ -1,41 +1,64 @@
 "use client";
 
-import { FC, ReactNode, useMemo } from 'react';
-import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
-import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
-import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
-import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
-import { clusterApiUrl } from '@solana/web3.js';
+import { FC, ReactNode } from 'react';
+import { WagmiProvider, createConfig, http } from 'wagmi';
+import { base } from 'wagmi/chains';
+import { injected, walletConnect, metaMask, coinbaseWallet } from 'wagmi/connectors';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-// Default styles that can be overridden by your app
-require('@solana/wallet-adapter-react-ui/styles.css');
+// Dynamic app URL based on environment
+const getAppUrl = () => {
+  if (typeof window !== 'undefined') {
+    return window.location.origin;
+  }
+  return process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+};
+
+// Create wagmi config for Base network
+const config = createConfig({
+  chains: [base],
+  connectors: [
+    metaMask({
+      dappMetadata: {
+        name: process.env.NEXT_PUBLIC_APP_NAME || "O'Watch.ID",
+        url: getAppUrl(),
+        iconUrl: "https://walletconnect.com/walletconnect-logo.png",
+      },
+    }),
+    injected({
+      target: 'rabby',
+    }),
+    coinbaseWallet({
+      appName: process.env.NEXT_PUBLIC_APP_NAME || "O'Watch.ID",
+    }),
+    walletConnect({
+      projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'your-project-id',
+      metadata: {
+        name: process.env.NEXT_PUBLIC_APP_NAME || "O'Watch.ID",
+        description: "Watch to Earn Platform",
+        url: getAppUrl(),
+        icons: ["https://walletconnect.com/walletconnect-logo.png"],
+      },
+    }),
+  ],
+  transports: {
+    [base.id]: http(process.env.NEXT_PUBLIC_BASE_RPC_URL || undefined),
+  },
+});
+
+// Create a client for React Query
+const queryClient = new QueryClient();
 
 interface WalletContextProviderProps {
   children: ReactNode;
 }
 
 export const WalletContextProvider: FC<WalletContextProviderProps> = ({ children }) => {
-  // The network can be set to 'devnet', 'testnet', or 'mainnet-beta'.
-  const network = WalletAdapterNetwork.Devnet;
-
-  // You can also provide a custom RPC endpoint.
-  const endpoint = useMemo(() => clusterApiUrl(network), [network]);
-
-  const wallets = useMemo(
-    () => [
-      new PhantomWalletAdapter(),
-    ],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [network]
-  );
-
   return (
-    <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect>
-        <WalletModalProvider>
-          {children}
-        </WalletModalProvider>
-      </WalletProvider>
-    </ConnectionProvider>
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        {children}
+      </QueryClientProvider>
+    </WagmiProvider>
   );
 };

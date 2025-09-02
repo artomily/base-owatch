@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useWallet } from '@solana/wallet-adapter-react';
-import dynamic from 'next/dynamic';
+import { useAccount, useConnect } from 'wagmi';
+import { injected } from 'wagmi/connectors';
 import {
   Button,
   Card,
@@ -24,20 +24,6 @@ import {
   Zap,
 } from "lucide-react";
 
-// Dynamically import wallet button to avoid SSR issues
-const WalletMultiButton = dynamic(
-  () => import('@solana/wallet-adapter-react-ui').then(mod => ({ default: mod.WalletMultiButton })),
-  {
-    ssr: false,
-    loading: () => (
-      <Button disabled size="lg" className="bg-purple-600 text-white px-8 py-4 text-lg">
-        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-        Loading...
-      </Button>
-    )
-  }
-);
-
 interface LandingPageProps {
   onWalletConnect?: () => void;
 }
@@ -45,30 +31,31 @@ interface LandingPageProps {
 export function LandingPage({
   onWalletConnect,
 }: LandingPageProps): JSX.Element {
-  const { connected, connecting } = useWallet();
+  const { isConnected, isConnecting } = useAccount();
+  const { connect } = useConnect();
   const router = useRouter();
-  const [isConnecting, setIsConnecting] = useState<boolean>(false);
+  const [isConnectingState, setIsConnectingState] = useState<boolean>(false);
 
   const handleWalletConnect = async (): Promise<void> => {
-    if (connected) {
+    if (isConnected) {
       // Already connected, redirect to dashboard
       router.push('/dashboard/videos');
       return;
     }
 
-    setIsConnecting(true);
-    // Wallet connection is handled by WalletMultiButton
+    setIsConnectingState(true);
+    connect({ connector: injected() });
     // Just wait a bit for connection to complete
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsConnecting(false);
+    setIsConnectingState(false);
   };
 
   // Auto redirect when wallet is connected
   useEffect(() => {
-    if (connected) {
+    if (isConnected) {
       router.push('/dashboard/videos');
     }
-  }, [connected, router]);
+  }, [isConnected, router]);
 
   const features = [
     {
@@ -168,23 +155,17 @@ export function LandingPage({
             tokens.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <WalletMultiButton
-              className="!bg-gradient-to-r !from-purple-500 !to-pink-500 hover:!from-purple-600 hover:!to-pink-600 !text-white !px-8 !py-4 !text-lg !rounded-lg !font-medium !transition-all"
-              style={{
-                background: 'linear-gradient(to right, #8b5cf6, #ec4899)',
-                border: 'none',
-                borderRadius: '8px',
-                padding: '16px 32px',
-                fontSize: '18px',
-                fontWeight: '500'
-              }}
+            <button
+              onClick={handleWalletConnect}
+              disabled={isConnecting || isConnectingState}
+              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-8 py-4 text-lg rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {connecting ? (
+              {(isConnecting || isConnectingState) ? (
                 <div className="flex items-center space-x-2">
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                   <span>Connecting...</span>
                 </div>
-              ) : connected ? (
+              ) : isConnected ? (
                 <>
                   <Wallet className="mr-2 h-5 w-5" />
                   Wallet Connected - Go to Dashboard
@@ -192,10 +173,10 @@ export function LandingPage({
               ) : (
                 <>
                   <Wallet className="mr-2 h-5 w-5" />
-                  Connect Phantom Wallet
+                  Connect Wallet
                 </>
               )}
-            </WalletMultiButton>
+            </button>
             <Button
               variant="outline"
               size="lg"
