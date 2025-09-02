@@ -166,21 +166,21 @@ export function LandingPage({
                   <span>Connecting...</span>
                 </div>
               ) : isConnected ? (
-                <>
-                  <Wallet className="mr-2 h-5 w-5" />
-                  Wallet Connected - Go to Dashboard
-                </>
+                <div className="flex items-center space-x-2">
+                  <Wallet className="h-5 w-5" />
+                  <span>Wallet Connected - Go to Dashboard</span>
+                </div>
               ) : (
-                <>
-                  <Wallet className="mr-2 h-5 w-5" />
-                  Connect Wallet
-                </>
+                <div className="flex items-center space-x-2">
+                  <Wallet className="h-5 w-5" />
+                  <span>Connect Wallet</span>
+                </div>
               )}
             </button>
             <Button
               variant="outline"
-              size="lg"
-              className="border-2 border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white px-8 py-4 text-lg bg-transparent"
+              size="xl"
+              className="border-2 border-purple-400 text-purple-400 hover:bg-purple-600 hover:text-white px-8 py-4 text-lg bg-transparent"
             >
               Learn More
             </Button>
@@ -313,7 +313,7 @@ export function LandingPage({
                 onClick={handleWalletConnect}
                 disabled={isConnecting}
                 size="lg"
-                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-12 py-4 text-lg"
+                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-8 py-4 text-lg"
               >
                 {isConnecting ? (
                   <div className="flex items-center space-x-2">
@@ -321,10 +321,10 @@ export function LandingPage({
                     <span>Connecting Wallet...</span>
                   </div>
                 ) : (
-                  <>
-                    <Wallet className="mr-2 h-5 w-5" />
-                    Connect Wallet & Start Earning
-                  </>
+                  <div className="flex items-center space-x-2">
+                    <Wallet className="h-5 w-5" />
+                    <span>Connect Wallet & Start Earning</span>
+                  </div>
                 )}
               </Button>
             </CardContent>

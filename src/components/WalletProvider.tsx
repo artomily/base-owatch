@@ -42,12 +42,39 @@ const config = createConfig({
     }),
   ],
   transports: {
-    [base.id]: http(process.env.NEXT_PUBLIC_BASE_RPC_URL || undefined),
+    [base.id]: http(process.env.NEXT_PUBLIC_BASE_RPC_URL || 'https://mainnet.base.org'),
   },
+  ssr: true, // Enable SSR support
 });
 
-// Create a client for React Query
-const queryClient = new QueryClient();
+// Create a client for React Query with better error handling
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: (failureCount, error) => {
+        // Don't retry on 4xx errors
+        if (error instanceof Error && error.message.includes('4')) {
+          return false;
+        }
+        // Don't retry connection errors
+        if (error instanceof Error && (
+          error.message.includes('Connection interrupted') ||
+          error.message.includes('WebSocket') ||
+          error.message.includes('network')
+        )) {
+          return false;
+        }
+        return failureCount < 2; // Reduce retry attempts
+      },
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false, // Disable auto refetch on reconnect
+    },
+    mutations: {
+      retry: 1,
+    },
+  },
+});
 
 interface WalletContextProviderProps {
   children: ReactNode;
