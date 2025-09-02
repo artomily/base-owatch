@@ -1,6 +1,7 @@
 "use client";
 
 import { Sidebar } from "@/components/layout/Sidebar";
+import { Header } from "@/components/layout/Header";
 import { MobileNav } from "@/components/layout/MobileNav";
 
 export default function DashboardLayout({
@@ -9,19 +10,26 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      {/* Desktop Sidebar */}
-      <div className="hidden lg:block">
-        <Sidebar />
-      </div>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      {/* Header */}
+      <Header />
 
-      {/* Mobile Navigation */}
-      <div className="lg:hidden">
-        <MobileNav />
-      </div>
+      <div className="flex flex-1">
+        {/* Desktop Sidebar */}
+        <div className="hidden lg:block">
+          <Sidebar />
+        </div>
 
-      {/* Main Content */}
-      <main className="flex-1 lg:ml-64 p-4 lg:p-8">{children}</main>
+        {/* Mobile Navigation */}
+        <div className="lg:hidden">
+          <MobileNav />
+        </div>
+
+        {/* Main Content */}
+        <main className="flex-1 lg:ml-64 p-6 lg:p-8">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }
