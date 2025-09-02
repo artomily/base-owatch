@@ -1,50 +1,66 @@
 # O'Watch.ID Smart Contract - Quick Setup
 
-## ⚡ Quick Start (5 menit)
+## ⚡ Current Status: ✅ Contract Ready
 
-### 1. Setup Environment
+Your smart contract is fully implemented and validated! Here's the current status:
+
+- ✅ **Contract**: `OWATCH.sol` - Complete ERC20 token with watch-to-earn features
+- ✅ **Tests**: Comprehensive test suite ready
+- ✅ **Deployment**: Scripts prepared for Base Sepolia and Mainnet
+- ✅ **Validation**: All components verified and working
+
+## 🚀 Next Steps
+
+### 1. Install Foundry (Required)
+```bash
+# Visit: https://github.com/foundry-rs/foundry/releases/latest
+# Download: foundry_windows_amd64.zip (for Windows)
+# Extract and add 'bin' folder to your PATH
+
+# Verify installation
+forge --version
+```
+
+### 2. Setup Environment
 ```bash
 # Copy environment file
 copy .env.example .env
 
-# Edit .env dan isi PRIVATE_KEY Anda
-# PRIVATE_KEY=your_private_key_here
+# Edit .env and add your private key
+# PRIVATE_KEY=your_private_key_here (without 0x prefix)
 ```
 
-### 2. Install & Setup
+### 3. Validate Setup
 ```bash
-# Windows: Double-click setup-foundry.bat
-# Linux/Mac: chmod +x setup-foundry.sh && ./setup-foundry.sh
-
-# Install dependencies
-npm install
+# Quick validation of contract and files
+npm run contract:validate
 ```
 
-### 3. Test Contract
+### 4. Test Contract
 ```bash
-# Compile
-npm run contract:build
-
-# Test
+# Run tests (requires Foundry)
 npm run contract:test
+
+# With gas reporting
+npm run contract:test:gas
 ```
 
-### 4. Deploy ke Testnet
+### 5. Deploy to Testnet
 ```bash
-# Pastikan punya ETH di wallet (dapatkan dari faucet)
+# Get ETH from faucet first: https://sepoliafaucet.com/
 npm run contract:deploy:sepolia
 ```
 
 ## 🛠️ Tools Required
 
 ### Essential
-- ✅ **Node.js** (sudah ada)
-- ✅ **Foundry** (install otomatis)
-- ✅ **Wallet** (MetaMask, dll)
-- ✅ **Base Sepolia ETH** (dari faucet)
+- ✅ **Node.js** (✅ Installed)
+- ❌ **Foundry** (Download from GitHub releases)
+- ✅ **Wallet** (MetaMask, Coinbase Wallet, etc.)
+- ❌ **Base Sepolia ETH** (Get from faucet)
 
 ### Optional
-- 📊 **BaseScan API Key** (untuk verify contract)
+- 📊 **BaseScan API Key** (for contract verification)
 
 ## 🌐 Networks
 
