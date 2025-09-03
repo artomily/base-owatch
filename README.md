@@ -27,8 +27,8 @@ Ready to help us build the future of media? Let's go.
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/your-username/owatch-protocol.git](https://github.com/your-username/owatch-protocol.git)
-    cd owatch-protocol
+    git clone [https://github.com/your-username/base-owatch.git](https://github.com/your-username/base-owatch.git)
+    cd base-owatch
     ```
 
 2.  **Install dependencies:**
